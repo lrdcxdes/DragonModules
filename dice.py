@@ -22,6 +22,6 @@ async def dice_text(client: Client, message: Message):
 
 
 modules_help["dice"] = {
-    "dice [emoji] [value]": "Работает только в чатах (default emoji 🎲)"
+    "dice [value]": "Работает только в чатах (default emoji 🎲)"
 }
 
