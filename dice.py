@@ -14,6 +14,8 @@ async def dice_text(client: Client, message: Message):
     chat = message.chat
     try:
         values = [int(val) for val in message.text.split()[1].split(',')]
+        if True not in [i in values for i in range(1, 7)]:
+            return await message.edit('Защита от дурачка, число больше 6 или меньше 1, нельзя')
         message.dice = BaseDice
         while message.dice.value not in values:
             message = (await asyncio.gather(message.delete(revoke=True),
