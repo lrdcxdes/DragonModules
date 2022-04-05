@@ -4,6 +4,11 @@ from utils.misc import modules_help, prefix
 from io import StringIO
 from contextlib import redirect_stdout
 from utils.scripts import format_exc
+from utils.scripts import import_library
+
+
+async_eval = import_library('async-eval')
+eval = async_eval.eval
 
 
 async def aexec(code):
@@ -22,10 +27,13 @@ async def aexec(code):
 
 
 @Client.on_message(filters.command(["aex", "aexec"], prefix) & filters.me)
-async def example_edit(client: Client, message: Message):
-    code = message.text.split(maxsplit=1)
+async def aexec_handler(client: Client, message: Message):
+    try:
+    	code = message.text.split(maxsplit=1)[1]
+    except:
+    	code = ''
     if not code:
-        return await message.edit('<b>Не найден код внутри сообщения.</b>')
+        return await message.edit('<b>Not found code to execute.</b>')
     try:
         await message.edit("<b>Executing...</b>")
         s = await aexec(code)
@@ -33,26 +41,29 @@ async def example_edit(client: Client, message: Message):
         return await message.edit(f'<b>Code:</b>\n<code>{code.replace("<", "").replace(">", "")}</code>\n\n<b>Result'
                                   f':</b>\n<code>{s}</code>')
     except Exception as ex:
-        return await message.edit(f'<b>Ошибка:</b>\n<code>{format_exc(ex)}}</code>')
+        return await message.edit(f'<b>Error:</b>\n<code>{format_exc(ex)}</code>')
 
 
 @Client.on_message(filters.command(["aev", "aeval"], prefix) & filters.me)
-async def example_edit(client: Client, message: Message):
-    code = message.text.split(maxsplit=1)
+async def aeval_handler(client: Client, message: Message):
+    try:
+    	code = message.text.split(maxsplit=1)[1]
+    except:
+    	code = ''
     if not code:
-        return await message.edit('<b>Не найден код внутри сообщения.</b>')
+        return await message.edit('<b>Not found expression.</b>')
     try:
         await message.edit("<b>Executing...</b>")
-        s = await eval(code)
-        s = s.replace('<', '').replace('>', '') if s else ''
+        s = eval(code)
+        s = s.replace('<', '').replace('>', '') if type(s) == str else s
         return await message.edit(f'<b>Expression:</b>\n<code>{code.replace("<", "").replace(">", "")}</code>\n\n<b>Result'
                                   f':</b>\n<code>{s}</code>')
     except Exception as ex:
-        return await message.edit(f'<b>Ошибка:</b>\n<code>{format_exc(ex)}</code>')
+        return await message.edit(f'<b>Error:</b>\n<code>{format_exc(ex)}</code>')
 
 
 # This adds instructions for your module
-modules_help["aexeval"] = {
+modules_help["python"] = {
     "aex [code]": "Async execute python code",
     "aev [code]": "Async evaluate python code",
     "aexec [code]": "Async execute python code",
