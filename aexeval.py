@@ -13,8 +13,8 @@ async def aexec(code):
         return await locals()['__todo']()
     else:
         f = StringIO()
+        exec(code)
         with redirect_stdout(f):
-            exec(code)
             await locals()['__todo']()
         s = f.getvalue()
         return s
