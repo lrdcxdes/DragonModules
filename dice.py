@@ -21,6 +21,7 @@ async def dice_text(client: Client, message: Message):
         await message.edit(f"<b>Произошла ошибка:</b> <code>{e}</code>")
 
 
-modules_help.append(
-    {"dice": [{"dice": "Используйте: <code>.dice [значения через запятую]</code> (default emoji 🎲)"}]}
-)
+modules_help["dice"] = {
+    "dice [emoji] [value]": "Работает только в чатах (default emoji 🎲)"
+}
+
