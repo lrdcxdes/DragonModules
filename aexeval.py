@@ -3,6 +3,7 @@ from pyrogram.types import Message
 from utils.misc import modules_help, prefix
 from io import StringIO
 from contextlib import redirect_stdout
+from utils.scripts import format_exc
 
 
 async def aexec(code):
@@ -22,28 +23,30 @@ async def aexec(code):
 
 @Client.on_message(filters.command(["aex", "aexec"], prefix) & filters.me)
 async def example_edit(client: Client, message: Message):
-    code = ' '.join(message.text.split()[1:])
+    code = message.text.split(maxsplit=1)
     if not code:
         return await message.edit('<b>Не найден код внутри сообщения.</b>')
     try:
         s = await aexec(code)
+        s = s.replace('<', '').replace('>', '') if s else ''
         return await message.edit(f'<b>Code:</b>\n<code>{code.replace("<", "").replace(">", "")}</code>\n\n<b>Result'
                                   f':</b>\n<code>{s}</code>')
     except Exception as ex:
-        return await message.edit(f'<b>Ошибка:</b>\n<code>{ex}</code>')
+        return await message.edit(f'<b>Ошибка:</b>\n<code>{format_exc(ex)}}</code>')
 
 
 @Client.on_message(filters.command(["aev", "aeval"], prefix) & filters.me)
 async def example_edit(client: Client, message: Message):
-    code = ' '.join(message.text.split()[1:])
+    code = message.text.split(maxsplit=1)
     if not code:
         return await message.edit('<b>Не найден код внутри сообщения.</b>')
     try:
         s = await eval(code)
+        s = s.replace('<', '').replace('>', '') if s else ''
         return await message.edit(f'<b>Expression:</b>\n<code>{code.replace("<", "").replace(">", "")}</code>\n\n<b>Result'
                                   f':</b>\n<code>{s}</code>')
     except Exception as ex:
-        return await message.edit(f'<b>Ошибка:</b>\n<code>{ex}</code>')
+        return await message.edit(f'<b>Ошибка:</b>\n<code>{format_exc(ex)}</code>')
 
 
 # This adds instructions for your module
