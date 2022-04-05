@@ -27,6 +27,7 @@ async def example_edit(client: Client, message: Message):
     if not code:
         return await message.edit('<b>Не найден код внутри сообщения.</b>')
     try:
+        await message.edit("<b>Executing...</b>")
         s = await aexec(code)
         s = s.replace('<', '').replace('>', '') if s else ''
         return await message.edit(f'<b>Code:</b>\n<code>{code.replace("<", "").replace(">", "")}</code>\n\n<b>Result'
@@ -41,6 +42,7 @@ async def example_edit(client: Client, message: Message):
     if not code:
         return await message.edit('<b>Не найден код внутри сообщения.</b>')
     try:
+        await message.edit("<b>Executing...</b>")
         s = await eval(code)
         s = s.replace('<', '').replace('>', '') if s else ''
         return await message.edit(f'<b>Expression:</b>\n<code>{code.replace("<", "").replace(">", "")}</code>\n\n<b>Result'
