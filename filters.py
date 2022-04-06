@@ -9,7 +9,7 @@ from utils.scripts import format_exc
 from utils.db import db
 
 
-all_filters_ = {key: item for key, item in db.get_collection('lordcodes.filters').items()}
+all_filters_ =  db.get_collection('lordcodes.filters').items()
 
 
 def all_filters():
@@ -215,7 +215,7 @@ async def filter_del_handler(client: Client, message: Message):
             return await message.edit(
                         f"<b>Usage</b>: <code>{prefix}fdel [name]</code>"
                     )
-        name = message.text.split(maxsplit=1)[1]
+        name = message.text.split(maxsplit=1)[1].lower()
         value = db.get('lordcodes.filters', name)
         if not value:
             return await message.edit(
@@ -225,7 +225,7 @@ async def filter_del_handler(client: Client, message: Message):
             del all_filters_[name]
         except:
             pass
-        db.remove('lordcodes.filters', f'filter_{name}')
+        db.remove('lordcodes.filters', name)
         return await message.edit(
                 f"<b>Filter</b> <code>{name}</code> has been deleted."
             )
@@ -240,7 +240,7 @@ async def filter_search_handler(client: Client, message: Message):
             return await message.edit(
                         f"<b>Usage</b>: <code>{prefix}fsearch [name]</code>"
                     )
-        name = message.text.split(maxsplit=1)[1]
+        name = message.text.split(maxsplit=1)[1].lower()
         value = db.get('lordcodes.filters', name, False)
         if not value:
             return await message.edit(f'<b>Filter</b> <code>{name}</code> doesn\'t exists.')
