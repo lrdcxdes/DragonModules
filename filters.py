@@ -30,6 +30,7 @@ async def contains_filter(_, __, m):
 contains = filters.create(contains_filter)
 
 
+# noinspection PyTypeChecker
 @Client.on_message(contains)
 async def filters_main_handler(client: Client, message: Message):
     value = get_filters_chat(message.chat.id)[message.text.lower()]
