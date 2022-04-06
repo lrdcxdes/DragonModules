@@ -1,4 +1,4 @@
-from pyrogram import Client, filters
+from pyrogram import Client, filters, ContinuePropagation
 from pyrogram.types import Message
 
 # noinspection PyUnresolvedReferences
@@ -26,7 +26,7 @@ contains = filters.create(contains_filter)
 @Client.on_message(contains)
 async def filters_main_handler(client: Client, message: Message):
     await message.reply(all_filters()[message.text.lower()])
-    message.continue_propagation()
+    raise ContinuePropagation
 
 
 @Client.on_message(filters.command(["filter"], prefix) & filters.me)
