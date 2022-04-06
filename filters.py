@@ -25,7 +25,8 @@ contains = filters.create(contains_filter)
 
 @Client.on_message(contains)
 async def filters_main_handler(client: Client, message: Message):
-    return await message.reply(all_filters()[message.text.lower()])
+    await message.reply(all_filters()[message.text.lower()])
+    message.continue_propagation()
 
 
 @Client.on_message(filters.command(["filter"], prefix) & filters.me)
