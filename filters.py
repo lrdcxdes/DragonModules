@@ -70,7 +70,7 @@ async def filters_handler(client: Client, message: Message):
             if key[:6] == 'filter':
                 key = key[7:].replace('<', '').replace('>', '')
                 answer = item['answer'].replace('<', '').replace('>', '')
-                text += f"{index}. <code>{key}</code> — <code>{answer}</code>\n"
+                text += f"{index}. <code>{key}</code>\n"
         text = f"<b>Filters</b>:\n\n" \
                f"{text}"
         text = text[:4096]
