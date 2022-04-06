@@ -16,11 +16,11 @@ from utils.db import db
 
 
 def get_filters_chat(chat_id):
-    return db.get("lordcodes.filters", f"{chat_id}", {})
+    return db.get("core.filters", f"{chat_id}", {})
 
 
 def set_filters_chat(chat_id, filters_):
-    return db.set("lordcodes.filters", f"{chat_id}", filters_)
+    return db.set("core.filters", f"{chat_id}", filters_)
 
 
 async def contains_filter(_, __, m):
