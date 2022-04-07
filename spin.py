@@ -27,11 +27,15 @@ def create_gif(offset: int, fps: int = 2):
 
 @Client.on_message(filters.command('spin', prefix) & filters.me)
 async def spin_handler(client: Client, message: Message):
-    if not message.reply_to_message or not message.reply_to_message.sticker:
-        await message.edit('<b>Reply to a sticker to spin it!</b>')
+    if not message.reply_to_message or not (message.reply_to_message.sticker or message.reply_to_message.document,
+                                            message.reply_to_message.photo):
+        await message.edit('<b>Reply to a sticker/photo/document to spin it!</b>')
         return
     await message.edit('<b>Downloading sticker...</b>')
-    await message.reply_to_message.download('sticker.webp')
+    try:
+        await message.reply_to_message.download('sticker.webp')
+    except Exception as ex:
+        return await message.edit(f'<b>Message can not be loaded:</b>\n<code>{format_exc(ex)}</code>')
     await message.edit('<b>Spinning...</b>')
     offset = int(message.command[1]) if len(message.command) > 1 else 5
     fps = int(message.command[2]) if len(message.command) > 2 else 20
