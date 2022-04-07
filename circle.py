@@ -15,7 +15,7 @@ from utils.scripts import import_library, format_exc
 VideoFileClip = import_library("moviepy.editor", "moviepy").VideoFileClip
 
 
-@Client.on_message(filters.command(["circle", "round"], prefix))
+@Client.on_message(filters.command(["circle", "round"], prefix) & filters.me)
 async def circle(client: Client, message: Message):
     try:
         if not message.reply_to_message:
