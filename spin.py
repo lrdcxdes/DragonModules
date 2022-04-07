@@ -1,4 +1,5 @@
 import asyncio
+import random
 from io import BytesIO
 
 import aiohttp
@@ -15,21 +16,13 @@ from modules.squotes import render_message
 
 Image = import_library('PIL', 'pillow').Image
 np = import_library('numpy')
-cv2 = import_library('cv2', 'opencv-python')
 imageio = import_library('imageio')
-
-
-def rotate_image(image, angle):
-    image_center = tuple(np.array(image.shape[1::-1]) / 2)
-    rot_mat = cv2.getRotationMatrix2D(image_center, angle, 1.0)
-    result = cv2.warpAffine(image, rot_mat, image.shape[1::-1], flags=cv2.INTER_LINEAR)
-    return result
 
 
 def create_gif(filename: str, offset: int, fps: int = 2, typ: str = 'spin'):
     img = Image.open(f'downloads/{filename}')
     if typ.lower() != 'spin':
-        img = img.resize((max(img.size), max(img.size)), Image.ANTIALIAS)
+        img = img.resize((random.randint(200, 1280), random.randint(200, 1280)), Image.ANTIALIAS)
     imageio.mimsave('downloads/video.gif', [img.rotate(-(i % 360)) for i in range(1, 361, offset)], fps=fps)
 
 
@@ -94,7 +87,7 @@ async def spin_handler(client: Client, message: Message):
         coro = True
         if message.reply_to_message.document:
             filename = message.reply_to_message.document.file_name
-            if not filename.endswith('.webp') and not filename.endswith('.png') and not filename.endswith('.jpg')\
+            if not filename.endswith('.webp') and not filename.endswith('.png') and not filename.endswith('.jpg') \
                     and not filename.endswith('.jpeg'):
                 return await message.edit('<b>Invalid file type!</b>')
         elif message.reply_to_message.sticker:
@@ -107,7 +100,7 @@ async def spin_handler(client: Client, message: Message):
                 filename = 'sticker.png'
             else:
                 filename = 'sticker.webp'
-            open(f'downloads/'+filename, 'wb').write(result[0].getbuffer())
+            open(f'downloads/' + filename, 'wb').write(result[0].getbuffer())
             coro = False
         else:
             filename = 'photo.jpg'
@@ -130,6 +123,6 @@ async def spin_handler(client: Client, message: Message):
 
 
 modules_help["spin"] = {
-   "spin [offset] [fps]": "Spin message (Reply required)",
-   "dspin [offset] [fps]": "SHAKAL spin message (Reply required)",
+    "spin [offset] [fps]": "Spin message (Reply required)",
+    "dspin [offset] [fps]": "SHAKAL spin message (Reply required)",
 }
