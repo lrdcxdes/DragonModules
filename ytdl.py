@@ -3,7 +3,7 @@ from pyrogram.types import Message
 from utils.misc import modules_help, prefix
 from utils.scripts import format_exc, import_library
 import os
-from io import BytesIO
+from asyncio import get_event_loop
 
 
 youtube_dl = import_library("youtube_dl")
@@ -37,6 +37,18 @@ strings = {
 }
 
 
+rip_data = None
+
+
+def download_video(opts, url):
+    global rip_data
+    try:
+        with YoutubeDL(opts) as rip:
+            rip_data = rip.extract_info(url)
+    except Exception as ex:
+        rip_data = ex
+
+
 @Client.on_message(filters.command(["ytdl", "dlyt"], prefix) & filters.me)
 async def ytdl_handler(client: Client, message: Message):
     try:
@@ -60,8 +72,9 @@ async def ytdl_handler(client: Client, message: Message):
     }
     await message.edit(strings["downloading"])
     try:
-        with YoutubeDL(opts) as rip:
-            rip_data = rip.extract_info(url)
+        await get_event_loop().run_in_executor(None, lambda: download_video(opts, url))
+        if type(rip_data) != dict:
+            raise rip_data
     except DownloadError as DE:
         return await message.edit(strings["err"].format(DE))
     except ContentTooShortError:
