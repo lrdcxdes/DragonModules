@@ -20,8 +20,8 @@ def rotate_image(image, angle):
     return result
 
 
-def create_gif(offset: int, fps: int = 2):
-    img = Image.open('downloads/sticker.webp')
+def create_gif(filename: str, offset: int, fps: int = 2):
+    img = Image.open(f'downloads/{filename}')
     imageio.mimsave('downloads/video.gif', [img.rotate(-(i % 360)) for i in range(1, 361, offset)], fps=fps)
 
 
