@@ -20,12 +20,14 @@ def rotate_image(image, angle):
     return result
 
 
-def create_gif(filename: str, offset: int, fps: int = 2):
+def create_gif(filename: str, offset: int, fps: int = 2, typ: str = 'spin'):
     img = Image.open(f'downloads/{filename}')
+    if typ.lower() != 'spin':
+        img = img.resize((max(img.size), max(img.size)), Image.ANTIALIAS)
     imageio.mimsave('downloads/video.gif', [img.rotate(-(i % 360)) for i in range(1, 361, offset)], fps=fps)
 
 
-@Client.on_message(filters.command('spin', prefix) & filters.me)
+@Client.on_message(filters.command(['spin', 'dspin'], prefix) & filters.me)
 async def spin_handler(client: Client, message: Message):
     if not message.reply_to_message or not (message.reply_to_message.sticker or message.reply_to_message.document
                                             or message.reply_to_message.photo):
@@ -55,7 +57,7 @@ async def spin_handler(client: Client, message: Message):
     fps = int(message.command[2]) if len(message.command) > 2 else default
     try:
         loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, lambda: create_gif(filename, offset, fps))
+        await loop.run_in_executor(None, lambda: create_gif(filename, offset, fps, message.command[0]))
         await message.delete()
         return await client.send_animation(chat_id=message.chat.id,
                                            animation='downloads/video.gif',
@@ -66,4 +68,5 @@ async def spin_handler(client: Client, message: Message):
 
 modules_help["spin"] = {
    "spin [offset] [fps]": "Spin sticker (Reply required)",
+   "dspin [offset] [fps]": "SHAKAL spin sticker (Reply required)",
 }
