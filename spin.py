@@ -37,14 +37,16 @@ async def spin_handler(client: Client, message: Message):
             filename = message.reply_to_message.document.file_name
             if not filename.endswith('.webp') and not filename.endswith('.png') and not filename.endswith('.jpg'):
                 return await message.edit('<b>Invalid file type!</b>')
+            default = 15
         else:
             filename = 'sticker.webp' if message.reply_to_message.sticker else 'photo.jpg'
+            default = 20 if message.reply_to_message.sticker else 15
         await message.reply_to_message.download(f'downloads/{filename}')
     except Exception as ex:
         return await message.edit(f'<b>Message can not be loaded:</b>\n<code>{format_exc(ex)}</code>')
     await message.edit('<b>Spinning...</b>')
-    offset = int(message.command[1]) if len(message.command) > 1 else 5
-    fps = int(message.command[2]) if len(message.command) > 2 else 20
+    offset = int(message.command[1]) if len(message.command) > 1 else 6
+    fps = int(message.command[2]) if len(message.command) > 2 else default
     try:
         loop = asyncio.get_event_loop()
         await loop.run_in_executor(None, lambda: create_gif(filename, offset, fps))
