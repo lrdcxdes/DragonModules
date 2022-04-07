@@ -26,7 +26,7 @@ async def circle(client: Client, message: Message):
             if message.reply_to_message.sticker.is_video:
                 return await message.reply('<b>Video stickers is not supported</b>')
             filename = 'circle.webp'
-            typ = 'sticker'
+            typ = 'photo'
         elif message.reply_to_message.video:
             filename = 'circle.mp4'
             typ = 'video'
