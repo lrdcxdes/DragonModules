@@ -60,7 +60,7 @@ async def spotdl_handler(client: Client, message: Message):
                     caption=f"<b>{name}</b>\n" f"<code>{spoti_query}</code>",
                 )
                 os.remove(f"downloads/{name}.mp3")
-                return
+                return await message.delete()
             else:
                 return await message.edit(
                     f"<b>Spotify-Download error:</b>\n<code>{logs}</code>"
