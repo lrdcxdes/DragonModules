@@ -36,8 +36,6 @@ async def spotdl_handler(client: Client, message: Message):
     elif message.reply_to_message:
         spoti_query = message.reply_to_message.text.split('\n')[0]
 
-    await message.edit("<b>Processing...</b>")
-
     if not ffmpeg:
         return await message.edit(
             "<b>Please install (ffmpeg.org) library on your os (and restart Dragon-Userbot)</b>",
