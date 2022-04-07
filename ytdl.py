@@ -49,7 +49,7 @@ def download_video(opts, url):
         rip_data = ex
 
 
-@Client.on_message(filters.command(["ytdl", "dlyt"], prefix) & filters.me)
+@Client.on_message(filters.command(["ytdl", "dlyt", "yt"], prefix) & filters.me)
 async def ytdl_handler(client: Client, message: Message):
     try:
         url = message.command[1]
@@ -102,5 +102,5 @@ async def ytdl_handler(client: Client, message: Message):
 
 
 modules_help['ytdl'] = {
-    'ytdl [link]': 'Download video by link'
+    'yt [link]': 'Download video by link'
 }
