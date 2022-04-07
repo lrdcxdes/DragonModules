@@ -28,9 +28,13 @@ except:
 # noinspection PyUnusedLocal
 @Client.on_message(filters.command(["spotdl", "sdl"], prefix) & filters.me)
 async def spotdl_handler(client: Client, message: Message):
-    if len(message.command) == 1:
+    if len(message.command) == 1 and not message.reply_to_message:
         await message.edit("<b>Please use:</b> <code>.spotdl [link]</code>")
         return
+    elif len(message.command) > 1:
+        spoti_query = message.command[1]
+    elif message.reply_to_message:
+        spoti_query = message.reply_to_message.text.split('\n')[0]
 
     await message.edit("<b>Processing...</b>")
 
@@ -44,7 +48,7 @@ async def spotdl_handler(client: Client, message: Message):
 
     try:
         download = check_call(
-            ["spotdl", "--output", "downloads/", f'"{message.command[1]}"'],
+            ["spotdl", "--output", "downloads/", f'"{spoti_query}"'],
             stdout=open("spotdl_logs.txt", "wb"),
         )
         logs = open("spotdl_logs.txt", "r", encoding="utf-8").read()
@@ -54,7 +58,7 @@ async def spotdl_handler(client: Client, message: Message):
             name = logs.split("\" as it's already downloaded")[0].split('"')[-1]
             await message.reply_audio(
                 f"downloads/{name}.mp3",
-                caption=f"<b>{name}</b>\n" f"<code>{message.command[1]}</code>",
+                caption=f"<b>{name}</b>\n" f"<code>{spoti_query}</code>",
             )
             os.remove(f"downloads/{name}.mp3")
             return
@@ -68,7 +72,7 @@ async def spotdl_handler(client: Client, message: Message):
     for name in set(music_names):
         await message.reply_audio(
             f"downloads/{name}.mp3",
-            caption=f"<b>{name}</b>\n" f"<code>{message.command[1]}</code>",
+            caption=f"<b>{name}</b>\n" f"<code>{spoti_query}</code>",
         )
         os.remove(f"downloads/{name}.mp3")
         await asyncio.sleep(0.5)
