@@ -102,6 +102,5 @@ async def ytdl_handler(client: Client, message: Message):
 
 
 modules_help['ytdl'] = {
-    'ytdl [link]': 'Download video by link',
-    'dlyt [link]': 'Download video by link',
+    'ytdl [link]': 'Download video by link'
 }
