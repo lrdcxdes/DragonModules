@@ -1,3 +1,4 @@
+from aiohttp import ClientSession
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from utils.misc import modules_help, prefix
@@ -7,6 +8,7 @@ from asyncio import get_event_loop
 
 
 youtube_dl = import_library("youtube_dl")
+pillow = import_library("PIL")
 YoutubeDL = youtube_dl.YoutubeDL
 DownloadError = youtube_dl.utils.DownloadError
 ContentTooShortError = youtube_dl.utils.ContentTooShortError
@@ -49,27 +51,50 @@ def download_video(opts, url):
         rip_data = ex
 
 
-@Client.on_message(filters.command(["ytdl", "dlyt", "yt"], prefix) & filters.me)
+@Client.on_message(filters.command(["ytdl", "yt", 'yt3', 'ytdl3'], prefix) & filters.me)
 async def ytdl_handler(client: Client, message: Message):
     try:
         url = message.command[1]
     except IndexError:
         return await message.edit(strings["noargs"])
     await message.edit(strings["preparing"])
-    opts = {
-        "format": "best",
-        "addmetadata": True,
-        "key": "FFmpegMetadata",
-        "prefer_ffmpeg": True,
-        "geo_bypass": True,
-        "nocheckcertificate": True,
-        "postprocessors": [
-            {"key": "FFmpegVideoConvertor", "preferedformat": "mp4"}
-        ],
-        "outtmpl": "downloads/%(id)s.mp4",
-        "logtostderr": False,
-        "quiet": True,
-    }
+    if message.command[0] in ["yt3", "ytdl3"]:
+        opts = {
+            "format": "bestaudio",
+            "addmetadata": True,
+            "key": "FFmpegMetadata",
+            "writethumbnail": True,
+            "prefer_ffmpeg": True,
+            "geo_bypass": True,
+            "nocheckcertificate": True,
+            "postprocessors": [
+                {
+                    "key": "FFmpegExtractAudio",
+                    "preferredcodec": "mp3",
+                    "preferredquality": "320",
+                }
+            ],
+            "outtmpl": "downloads/%(id)s.mp3",
+            "quiet": True,
+            "logtostderr": False,
+        }
+        video = False
+    else:
+        opts = {
+            "format": "best",
+            "addmetadata": True,
+            "key": "FFmpegMetadata",
+            "prefer_ffmpeg": True,
+            "geo_bypass": True,
+            "nocheckcertificate": True,
+            "postprocessors": [
+                {"key": "FFmpegVideoConvertor", "preferedformat": "mp4"}
+            ],
+            "outtmpl": "downloads/%(id)s.mp4",
+            "logtostderr": False,
+            "quiet": True,
+        }
+        video = True
     await message.edit(strings["downloading"])
     try:
         await get_event_loop().run_in_executor(None, lambda: download_video(opts, url))
@@ -94,13 +119,39 @@ async def ytdl_handler(client: Client, message: Message):
     except Exception as e:
         return await message.edit('<b>[YouTube-Dl]</b>\n' + format_exc(e))
 
-    await message.reply_video(f"downloads/{rip_data['id']}.mp4", caption=rip_data["title"])
-
-    os.remove(f"downloads/{rip_data['id']}.mp4")
+    if video:
+        thumb = rip_data.get("thumbnail")
+        if thumb:
+            try:
+                async with ClientSession() as session:
+                    async with session.get(thumb) as resp:
+                        if resp.status == 200:
+                            with open('downloads/thumb.jpg', 'wb') as f_thumb:
+                                f_thumb.write(await resp.read())
+                                thumb = 'downloads/thumb.jpg'
+                                im = pillow.Image.open(thumb)
+                                im.convert('RGB').resize((im.size[0], 320), pillow.Image.ANTIALIAS).save(thumb, 'JPEG')
+                        else:
+                            thumb = None
+            except:
+                thumb = None
+        await message.reply_video(f"downloads/{rip_data['id']}.mp4", caption=f'<b>{rip_data["title"]}</b>',
+                                  thumb=thumb, duration=rip_data["duration"],
+                                  width=rip_data["width"], height=rip_data["height"])
+        os.remove(f"downloads/{rip_data['id']}.mp4")
+        try:
+            os.remove('downloads/thumb.jpg')
+        except:
+            pass
+    else:
+        await message.reply_audio(f"downloads/{rip_data['id']}.mp3", caption=f'<b>{rip_data["title"]}</b>',
+                                  duration=rip_data["duration"])
+        os.remove(f"downloads/{rip_data['id']}.mp3")
 
     return await message.delete()
 
 
 modules_help['ytdl'] = {
-    'yt [link]': 'Download video by link'
+    'yt [link]': 'Download video by link with best quality',
+    'yt3 [link]': 'Download audio by link with best quality',
 }
