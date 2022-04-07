@@ -81,11 +81,7 @@ async def ytdl_handler(client: Client, message: Message):
     except Exception as e:
         return await message.edit('<b>[YouTube-Dl]</b>\n' + format_exc(e))
 
-    file = BytesIO(open(f"downloads/{rip_data['id']}.mp4", 'rb').read())
-    file.name = f'{rip_data["id"]}.mp4'
-    file.seek(0)
-
-    await message.reply_video(file, caption=rip_data["title"])
+    await message.reply_video(f"downloads/{rip_data['id']}.mp4", caption=rip_data["title"])
 
     os.remove(f"downloads/{rip_data['id']}.mp4")
 
