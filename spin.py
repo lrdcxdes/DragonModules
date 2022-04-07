@@ -33,7 +33,13 @@ async def spin_handler(client: Client, message: Message):
         return
     await message.edit('<b>Downloading sticker...</b>')
     try:
-        await message.reply_to_message.download('sticker.webp')
+        if message.reply_to_message.document:
+            filename = message.reply_to_message.document.file_name
+            if not filename.endswith('.webp') and not filename.endswith('.png') and not filename.endswith('.jpg'):
+                return await message.edit('<b>Invalid file type!</b>')
+        else:
+            filename = 'sticker.webp' if message.reply_to_message.sticker else 'photo.jpg'
+        await message.reply_to_message.download(f'downloads/{filename}')
     except Exception as ex:
         return await message.edit(f'<b>Message can not be loaded:</b>\n<code>{format_exc(ex)}</code>')
     await message.edit('<b>Spinning...</b>')
@@ -41,7 +47,7 @@ async def spin_handler(client: Client, message: Message):
     fps = int(message.command[2]) if len(message.command) > 2 else 20
     try:
         loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, lambda: create_gif(offset, fps))
+        await loop.run_in_executor(None, lambda: create_gif(filename, offset, fps))
         await message.delete()
         return await client.send_animation(chat_id=message.chat.id,
                                            animation='downloads/video.gif',
