@@ -1,9 +1,7 @@
 import asyncio
-import sys
 
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from io import BytesIO
 import re
 
 # noinspection PyUnresolvedReferences
